@@ -18,6 +18,8 @@ export const register = async(req, res)=>{
             console.log("Email is required")
             return res.status(404).json({msg : "Invalid Credentials!"})
         }
+
+        
         
     } catch (error) {
         

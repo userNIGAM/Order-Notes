@@ -20,7 +20,7 @@ const orderSchema = mongoose.Schema({
         required : true,
     },
 
-})
+},{ timestamps: true })
 
 orderSchema.pre("save", async function(next){
     //only hash the password if it is modified
