@@ -1,48 +1,66 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt"
 
-const orderSchema = mongoose.Schema({
+const orderItemSchema = new mongoose.Schema(
+  {
+    itemId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Item",
+      required: true,
+    },
+
     name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        trim: true,
-        match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please use a valid email address"]
-    },
-    password : {
-        type : String,
-        required : true,
+      type: String,
+      required: true, // snapshot of item name
     },
 
-},{ timestamps: true })
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
 
-orderSchema.pre("save", async function(next){
-    //only hash the password if it is modified
-    // 'this' refers to the document being saved on controller
-    if(!this.isModified("password")){
-        return next()
-    }
-    try{
-        // Generate salt 
-        const salt = await bcrypt.genSalt(10)
+    priceAtThatTime: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
 
-        // Hash Password
-        this.password = await bcrypt.hash(this.password, salt);
+    total: {
+      type: Number,
+      required: true,
+    },
+  },
+  { _id: false }
+);
 
-        next();
-    }catch(error){
-        next(error)
-    }
-})
+const orderSchema = new mongoose.Schema(
+  {
+    customerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Customer",
+      required: true,
+      index: true,
+    },
 
-orderSchema.methods.comparePassword = async function (enteredPassword){
-    return await bcrypt.compare(enteredPassword, this.password)
-}
+    items: [orderItemSchema],
 
-export const Order = mongoose.model("Order", orderSchema);
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
+
+    date: {
+      type: Date,
+      required: true, // manual date entry (important)
+      index: true,
+    },
+
+    notes: {
+      type: String,
+      trim: true,
+    },
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("Order", orderSchema);
