@@ -1,7 +1,16 @@
-import express from "express"
-import {getCustomerLedger} from "../controllers/orderController.js"
-const router = express.Router()
+import express from "express";
+import {
+  getCustomerLedger,
+  createOrder,
+  getAllOrders,
+} from "../controllers/orderController.js";
 
-router.get("/getCustomer", getCustomerLedger)
+const router = express.Router();
 
-export default router
+// Ledger
+router.get("/:customerId", getCustomerLedger);
+
+// Orders
+router.route("/").post(createOrder).get(getAllOrders);
+
+export default router;

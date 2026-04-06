@@ -1,21 +1,22 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
-const customerSchema = mongoose.Schema({
-    name : {
-        type : String,
-        required : true,
+const customerSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
     },
-    email : {
-        type : String,
-        required : true,
-        trim : true,
+    openingBalance: {
+      type: Number,
+      default: 0,
     },
-    address : {
-        type : String,
-        required : true,
-        trim : true,
+    currentBalance: {
+      type: Number,
+      default: 0,
     },
-    
-})
+  },
+  { timestamps: true }
+);
 
 export const Customer = mongoose.model("Customer", customerSchema);

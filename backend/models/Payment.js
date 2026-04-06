@@ -6,40 +6,20 @@ const paymentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Customer",
       required: true,
-      index: true,
     },
-
     amountPaid: {
       type: Number,
       required: true,
-      min: 1,
+      min: 0,
     },
-
     paymentDate: {
       type: Date,
-      default: Date.now, // you can override from frontend if needed
+      default: Date.now,
     },
-
     method: {
       type: String,
-      enum: ["cash", "fonepay", "esewa", "bank", "other"],
+      enum: ["cash", "card", "online"],
       default: "cash",
-    },
-
-    note: {
-      type: String,
-      trim: true,
-    },
-
-    // Snapshot of balance at the time (VERY USEFUL)
-    balanceBefore: {
-      type: Number,
-      required: true,
-    },
-
-    balanceAfter: {
-      type: Number,
-      required: true,
     },
   },
   { timestamps: true }
