@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Order from "../models/Order.js";
 import Payment from "../models/Payment.js";
-import Customer from "../models/Customer.js";
+import {Customer} from "../models/Customer.js";
 
 export const getCustomerLedger = async (req, res) => {
   try {
