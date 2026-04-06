@@ -1,13 +1,13 @@
 // src/pages/Customers.jsx
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { motion } from 'framer-motion';
-import { Search, Eye } from 'lucide-react';
-import CustomerDetails from '../components/CustomerDetails';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { motion } from "framer-motion";
+import { Search, Eye } from "lucide-react";
+import CustomerDetails from "../components/CustomerDetails";
 
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   useEffect(() => {
@@ -16,15 +16,15 @@ const Customers = () => {
 
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/customers');
+      const res = await axios.get("http://localhost:5000/api/customers");
       setCustomers(res.data);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const filtered = customers.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase())
+  const filtered = customers.filter((c) =>
+    c.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -36,7 +36,9 @@ const Customers = () => {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Customers</h2>
-          <p className="text-gray-500 text-sm">View customer profiles and transaction history</p>
+          <p className="text-gray-500 text-sm">
+            View customer profiles and transaction history
+          </p>
         </div>
       </div>
 
@@ -53,7 +55,7 @@ const Customers = () => {
       </div>
 
       {/* Customers Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((customer, idx) => (
           <motion.div
             key={customer._id}
@@ -64,8 +66,17 @@ const Customers = () => {
           >
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-semibold text-lg text-gray-800">{customer.name}</h3>
-                <p className="text-sm text-gray-500 mt-1">Balance: <span className={`font-medium ${customer.currentBalance >= 0 ? 'text-green-600' : 'text-red-500'}`}>Rs. {customer.currentBalance}</span></p>
+                <h3 className="font-semibold text-lg text-gray-800">
+                  {customer.name}
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Balance:{" "}
+                  <span
+                    className={`font-medium ${customer.currentBalance >= 0 ? "text-green-600" : "text-red-500"}`}
+                  >
+                    Rs. {customer.currentBalance}
+                  </span>
+                </p>
               </div>
               <button
                 onClick={() => setSelectedCustomer(customer)}

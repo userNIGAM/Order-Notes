@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // src/pages/AddItem.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';

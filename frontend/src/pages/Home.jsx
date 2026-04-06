@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // src/pages/Home.jsx
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -56,7 +57,7 @@ const Home = () => {
                 <p className="text-gray-500 text-sm">{card.title}</p>
                 <p className="text-3xl font-bold text-gray-800 mt-1">{card.value}</p>
               </div>
-              <div className={`bg-gradient-to-br ${card.color} p-3 rounded-xl text-white shadow-sm`}>
+              <div className={`bg-linear-to-br ${card.color} p-3 rounded-xl text-white shadow-sm`}>
                 <card.icon size={22} />
               </div>
             </div>
