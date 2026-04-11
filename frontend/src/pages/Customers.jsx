@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // src/pages/Customers.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -11,9 +12,6 @@ const Customers = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   useEffect(() => {
-    fetchCustomers();
-  }, []);
-
   const fetchCustomers = async () => {
     try {
       const res = await axios.get("http://localhost:5000/api/customers");
@@ -22,6 +20,9 @@ const Customers = () => {
       console.error(err);
     }
   };
+
+  fetchCustomers();
+}, []);
 
   const filtered = customers.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()),

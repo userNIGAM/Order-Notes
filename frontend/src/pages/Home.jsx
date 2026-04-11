@@ -1,81 +1,160 @@
-/* eslint-disable no-unused-vars */
-// src/pages/Home.jsx
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { motion } from 'framer-motion';
-import { Users, Package, TrendingUp } from 'lucide-react';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { motion } from "framer-motion";
+import { Search, Plus, Trash2 } from "lucide-react";
 
-const Home = () => {
-  const [stats, setStats] = useState({ customers: 0, items: 0, orders: 0 });
+const CustomerItems = () => {
+  const [customers, setCustomers] = useState([]);
+  const [items, setItems] = useState([]);
+  const [search, setSearch] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [cart, setCart] = useState([]);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchData = async () => {
       try {
-        const [custRes, itemRes, orderRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/customers'),
-          axios.get('http://localhost:5000/api/items'),
-          axios.get('http://localhost:5000/api/orders'),
+        const [custRes, itemRes] = await Promise.all([
+          axios.get("http://localhost:5000/api/customers"),
+          axios.get("http://localhost:5000/api/items"),
         ]);
-        setStats({
-          customers: custRes.data.length,
-          items: itemRes.data.length,
-          orders: orderRes.data?.length || 0,
-        });
+        setCustomers(custRes.data);
+        setItems(itemRes.data);
       } catch (err) {
         console.error(err);
       }
     };
-    fetchStats();
+    fetchData();
   }, []);
 
-  const cards = [
-    { title: 'Total Customers', value: stats.customers, icon: Users, color: 'from-blue-500 to-indigo-600' },
-    { title: 'Inventory Items', value: stats.items, icon: Package, color: 'from-emerald-500 to-teal-600' },
-    { title: 'Orders Placed', value: stats.orders, icon: TrendingUp, color: 'from-amber-500 to-orange-600' },
-  ];
+  const filteredCustomers = customers.filter((c) =>
+    c.name.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  const addToCart = (item) => {
+    setCart((prev) => {
+      const existing = prev.find((i) => i._id === item._id);
+      if (existing) {
+        return prev.map((i) =>
+          i._id === item._id ? { ...i, qty: i.qty + 1 } : i,
+        );
+      }
+      return [...prev, { ...item, qty: 1 }];
+    });
+  };
+
+  const removeFromCart = (id) => {
+    setCart((prev) => prev.filter((i) => i._id !== id));
+  };
+
+  const submitOrder = async () => {
+    try {
+      await axios.post("http://localhost:5000/api/orders", {
+        customerId: selectedCustomer._id,
+        items: cart,
+      });
+      alert("Order Created");
+      setCart([]);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-    >
-      <h2 className="text-3xl font-bold text-gray-800 mb-2">Dashboard</h2>
-      <p className="text-gray-500 mb-8">Welcome back! Here's your business snapshot.</p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {cards.map((card, idx) => (
-          <motion.div
-            key={card.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow"
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Create Order</h2>
+
+      {/* Search Customer */}
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-3 text-gray-400" size={18} />
+        <input
+          type="text"
+          placeholder="Search customer..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Customer List */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {filteredCustomers.map((c) => (
+          <div
+            key={c._id}
+            onClick={() => setSelectedCustomer(c)}
+            className={`p-4 border rounded-xl cursor-pointer ${selectedCustomer?._id === c._id ? "border-blue-500 bg-blue-50" : ""}`}
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm">{card.title}</p>
-                <p className="text-3xl font-bold text-gray-800 mt-1">{card.value}</p>
-              </div>
-              <div className={`bg-linear-to-br ${card.color} p-3 rounded-xl text-white shadow-sm`}>
-                <card.icon size={22} />
-              </div>
-            </div>
-          </motion.div>
+            <p className="font-semibold">{c.name}</p>
+            <p className="text-sm text-gray-500">{c.phone}</p>
+          </div>
         ))}
       </div>
 
-      <div className="mt-10 bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-        <h3 className="font-semibold text-gray-800 mb-2">Quick Actions</h3>
-        <p className="text-sm text-gray-500">Use the sidebar to manage customers, items, and track orders.</p>
-        <div className="flex gap-3 mt-4">
-          <span className="text-xs bg-gray-100 px-3 py-1 rounded-full">✨ Add new customer</span>
-          <span className="text-xs bg-gray-100 px-3 py-1 rounded-full">📦 Create order from customer details</span>
-          <span className="text-xs bg-gray-100 px-3 py-1 rounded-full">📊 Track ledger balances</span>
-        </div>
-      </div>
-    </motion.div>
+      {selectedCustomer && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          {/* Items List */}
+          <div className="bg-white p-4 rounded-xl border">
+            <h3 className="font-semibold mb-3">Items</h3>
+            <div className="space-y-2 max-h-80 overflow-y-auto">
+              {items.map((item) => (
+                <div
+                  key={item._id}
+                  className="flex justify-between items-center border p-2 rounded-lg"
+                >
+                  <div>
+                    <p>{item.name}</p>
+                    <p className="text-xs text-gray-500">Rs {item.price}</p>
+                  </div>
+                  <button
+                    onClick={() => addToCart(item)}
+                    className="bg-blue-500 text-white p-2 rounded-lg"
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Cart */}
+          <div className="bg-white p-4 rounded-xl border">
+            <h3 className="font-semibold mb-3">Cart</h3>
+            <div className="space-y-2">
+              {cart.map((i) => (
+                <div
+                  key={i._id}
+                  className="flex justify-between items-center border p-2 rounded-lg"
+                >
+                  <div>
+                    <p>{i.name}</p>
+                    <p className="text-xs text-gray-500">Qty: {i.qty}</p>
+                  </div>
+                  <button
+                    onClick={() => removeFromCart(i._id)}
+                    className="text-red-500"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {cart.length > 0 && (
+              <button
+                onClick={submitOrder}
+                className="mt-4 w-full bg-green-500 text-white py-2 rounded-xl"
+              >
+                Create Order
+              </button>
+            )}
+          </div>
+        </motion.div>
+      )}
+    </div>
   );
 };
 
-export default Home;
+export default CustomerItems;
